@@ -3,7 +3,14 @@ numpy
 matplotlib
 jupyter
 pytest
+pytest-cov
 pydantic
 jinja2
 schedule
 httpx
+polars
+pyarrow
+seaborn
+plotly
+scikit-learn
+scipy
