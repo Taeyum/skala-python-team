@@ -1,4 +1,13 @@
-"""Pandas vs Polars 데이터 로딩·전처리 성능 비교"""
+"""
+Pandas vs Polars 데이터 로딩·전처리 성능 비교
+
+역할: 원본 parquet 파일을 Pandas/Polars 각각으로 로딩하고 동일한 조건으로
+      전처리(결측치·중복·이상치 제거, 파생 컬럼 생성)한 뒤 두 도구의 처리 시간을 비교한다.
+
+변경내역:
+  - 2026-07-21: 최초 작성
+  - 2026-07-21: 원본 파일 로딩 실패에 대한 예외 처리 추가
+"""
 
 import timeit
 
@@ -9,11 +18,19 @@ from . import config
 
 
 def load_pandas(path=config.RAW_DATA_PATH):
-    return pd.read_parquet(path)
+    """parquet 파일을 Pandas DataFrame으로 로딩"""
+    try:
+        return pd.read_parquet(path)
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"원본 데이터 파일을 찾을 수 없습니다: {path}") from e
 
 
 def load_polars(path=config.RAW_DATA_PATH):
-    return pl.read_parquet(path)
+    """parquet 파일을 Polars DataFrame으로 로딩"""
+    try:
+        return pl.read_parquet(path)
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"원본 데이터 파일을 찾을 수 없습니다: {path}") from e
 
 
 def preprocess_pandas(df):

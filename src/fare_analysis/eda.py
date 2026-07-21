@@ -1,4 +1,10 @@
-"""EDA: 결측치·중복 확인, 기술통계, 고요금(High-Fare) 라벨링"""
+"""
+EDA: 결측치·중복 확인, 기술통계, 고요금(High-Fare) 라벨링
+
+변경내역:
+  - 2026-07-21: 최초 작성
+  - 2026-07-21: 라벨링 임계값(quantile) 범위 검증 추가
+"""
 
 
 def summarize_missing_and_duplicates(df):
@@ -24,6 +30,9 @@ def descriptive_stats(df, columns=("fare_amount", "total_amount", "trip_distance
 def add_high_fare_label(df, quantile):
     """total_amount 상위 (1-quantile) 비율을 고요금(1)/일반(0)으로 라벨링한 DataFrame과
     기준 임계값(threshold)을 반환"""
+    if not 0 < quantile < 1:
+        raise ValueError(f"quantile은 0과 1 사이여야 합니다: {quantile}")
+
     threshold = df["total_amount"].quantile(quantile)
     labeled = df.assign(is_high_fare=(df["total_amount"] >= threshold).astype(int))
 

@@ -1,4 +1,10 @@
-"""전처리 + 분류 모델 Pipeline (고요금(is_high_fare) 운행 예측)"""
+"""
+전처리 + 분류 모델 Pipeline (고요금(is_high_fare) 운행 예측)
+
+변경내역:
+  - 2026-07-21: 최초 작성
+  - 2026-07-21: 모델 저장 실패에 대한 예외 처리 추가
+"""
 
 import joblib
 from sklearn.compose import ColumnTransformer
@@ -47,7 +53,12 @@ def train_evaluate_save(df, model_path):
     for name, value in metrics.items():
         print(f"  {name}: {value:.4f}")
 
-    joblib.dump(pipeline, model_path)
+    try:
+        joblib.dump(pipeline, model_path)
+    except OSError as e:
+        print(f"[ERROR] 모델 저장 실패: {e}")
+        raise
+
     reloaded = joblib.load(model_path)
     reloaded_acc = accuracy_score(y_test, reloaded.predict(X_test))
     assert abs(reloaded_acc - metrics["accuracy"]) < 1e-9, "재로딩한 모델의 정확도가 원본과 다릅니다"

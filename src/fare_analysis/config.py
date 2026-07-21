@@ -1,4 +1,9 @@
-"""요금 예측 & Pandas/Polars 성능 비교 프로젝트 공통 설정값"""
+"""
+요금 예측 & Pandas/Polars 성능 비교 프로젝트 공통 설정값
+
+변경내역:
+  - 2026-07-21: 최초 작성
+"""
 
 from pathlib import Path
 

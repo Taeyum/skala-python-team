@@ -1,4 +1,10 @@
-"""상관분석 및 t-test 가설 검정"""
+"""
+상관분석 및 t-test 가설 검정
+
+변경내역:
+  - 2026-07-21: 최초 작성
+  - 2026-07-21: t-test 방향성 판정 및 빈 그룹 예외 처리 추가
+"""
 
 from scipy import stats
 
@@ -16,6 +22,9 @@ def run_rush_hour_ttest(df, rush_hours):
     Welch's t-test(등분산 가정 없음)로 검정 (가설2 검증용)"""
     group_a = df.loc[df["pickup_hour"].isin(rush_hours), "total_amount"]
     group_b = df.loc[~df["pickup_hour"].isin(rush_hours), "total_amount"]
+
+    if group_a.empty or group_b.empty:
+        raise ValueError("혼잡/비혼잡 시간대 중 한쪽에 데이터가 없어 t-test를 수행할 수 없습니다")
 
     t_stat, p_value = stats.ttest_ind(group_a, group_b, equal_var=False)
     is_significant = p_value < 0.05

@@ -1,4 +1,10 @@
-"""분석 결과를 report.md로 자동 생성"""
+"""
+분석 결과를 report.md로 자동 생성
+
+변경내역:
+  - 2026-07-21: 최초 작성
+  - 2026-07-21: 리포트 저장 실패에 대한 예외 처리 추가
+"""
 
 from jinja2 import Template
 
@@ -52,5 +58,9 @@ TEMPLATE = """# 요금 예측 & 도구 성능 비교 분석 리포트
 def generate_report(context, save_path):
     """context 딕셔너리를 Jinja2 템플릿에 렌더링해 report.md로 저장"""
     report_text = Template(TEMPLATE).render(**context)
-    save_path.write_text(report_text, encoding="utf-8")
+    try:
+        save_path.write_text(report_text, encoding="utf-8")
+    except OSError as e:
+        print(f"[ERROR] 리포트 저장 실패: {e}")
+        raise
     print(f"[OK] 리포트 생성: {save_path}")
