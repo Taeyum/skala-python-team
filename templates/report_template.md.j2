@@ -1,0 +1,77 @@
+# NYC Yellow Taxi 고요금(High-Fare) 예측 분석 리포트
+
+- 생성 시각: {{ generated_at }}
+- 데이터: {{ dataset.path }} (원본 {{ "{:,}".format(dataset.rows_before) }}행 → 정제 후 {{ "{:,}".format(dataset.rows_after) }}행)
+
+## 1. 데이터 준비
+
+### Pandas vs Polars 처리 속도 비교
+| 작업 | Pandas(초) | Polars(초) |
+|---|---|---|
+{% for op in benchmark.operations -%}
+| {{ op.operation }} | {{ "%.4f"|format(op.pandas) }} | {{ "%.4f"|format(op.polars) }} |
+{% endfor %}
+
+### 결측치 (상위 컬럼)
+| 컬럼 | 결측 비율(%) |
+|---|---|
+{% for col, ratio in missing_summary.items() -%}
+| {{ col }} | {{ ratio }} |
+{% endfor %}
+
+- 중복행 제거: {{ duplicates_removed }}건
+
+### fare_amount / total_amount 기술통계
+| 통계량 | fare_amount | total_amount |
+|---|---|---|
+{% for stat in ["mean","std","min","25%","50%","75%","max"] -%}
+| {{ stat }} | {{ "%.2f"|format(fare_stats.fare_amount[stat]) }} | {{ "%.2f"|format(fare_stats.total_amount[stat]) }} |
+{% endfor %}
+
+## 2. 시각화
+- Seaborn 처리속도 비교 바차트: `{{ charts.benchmark_bar }}`
+- Plotly 시간대별 평균 총요금 라인차트: `{{ charts.hourly_fare_line }}`
+
+## 3. 통계 분석
+
+### 상관계수 (가설1: 운행시간·거리는 총요금과 강한 양의 상관관계를 가질 것이다)
+| | trip_distance | trip_duration | total_amount |
+|---|---|---|---|
+{% for row in correlation.matrix -%}
+| {{ row.label }} | {{ "%.4f"|format(row.trip_distance) }} | {{ "%.4f"|format(row.trip_duration) }} | {{ "%.4f"|format(row.total_amount) }} |
+{% endfor %}
+
+**결과**: {{ correlation.message }}
+
+### 혼잡시간대 t-test (가설2: 혼잡시간대(08-10,17-19시)는 비혼잡시간대보다 평균 총요금이 높을 것이다)
+- 혼잡시간대 평균: {{ "%.2f"|format(ttest.mean_rush) }} (n={{ "{:,}".format(ttest.n_rush) }})
+- 비혼잡시간대 평균: {{ "%.2f"|format(ttest.mean_non_rush) }} (n={{ "{:,}".format(ttest.n_non_rush) }})
+- t={{ "%.4f"|format(ttest.t_stat) }}, p={{ "%.4e"|format(ttest.p_value) }}
+
+**결과**: {{ ttest.message }}
+
+## 4. ML Pipeline — is_high_fare(고요금) 분류
+
+- 타겟: total_amount 상위 25% (임계값 ${{ "%.2f"|format(pipeline.threshold) }})
+- 학습 {{ "{:,}".format(pipeline.n_train) }}건 / 평가 {{ "{:,}".format(pipeline.n_test) }}건
+- 모델: ColumnTransformer(수치 스케일링+범주 원핫) + LogisticRegression(class_weight=balanced)
+
+| 지표 | 값 |
+|---|---|
+| Accuracy | {{ "%.4f"|format(pipeline.accuracy) }} |
+| Precision | {{ "%.4f"|format(pipeline.precision) }} |
+| Recall | {{ "%.4f"|format(pipeline.recall) }} |
+| F1 | {{ "%.4f"|format(pipeline.f1) }} |
+
+### Confusion Matrix
+| | 예측: 일반 | 예측: 고요금 |
+|---|---|---|
+| 실제: 일반 | {{ pipeline.confusion_matrix[0][0] }} | {{ pipeline.confusion_matrix[0][1] }} |
+| 실제: 고요금 | {{ pipeline.confusion_matrix[1][0] }} | {{ pipeline.confusion_matrix[1][1] }} |
+
+- 모델 저장: `{{ pipeline.model_path }}` (재로딩 예측 일치: {{ pipeline.reload_matches }})
+
+## 5. 결론
+
+- 가설1: {{ "채택" if correlation.hypothesis1_supported else "기각" }}
+- 가설2: {{ "채택" if ttest.hypothesis2_supported else "기각" }}

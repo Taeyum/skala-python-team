@@ -80,6 +80,8 @@ def congestion_ttest(
         "significant": significant,
         "mean_rush": mean_a,
         "mean_non_rush": mean_b,
+        "n_rush": len(group_a),
+        "n_non_rush": len(group_b),
         "hypothesis2_supported": hypothesis2_supported,
         "message": message,
     }
