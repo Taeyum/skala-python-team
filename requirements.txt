@@ -1,0 +1,9 @@
+pandas
+numpy
+matplotlib
+jupyter
+pytest
+pydantic
+jinja2
+schedule
+httpx
