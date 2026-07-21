@@ -6,6 +6,7 @@
 """
 
 from pathlib import Path
+import platform
 
 import matplotlib
 
@@ -17,8 +18,17 @@ import plotly.graph_objects as go
 import seaborn as sns
 
 
-def setup_korean_font(font_name: str = "AppleGothic") -> None:
-    """matplotlib 한글 폰트를 설정한다. 폰트가 없으면 경고만 남기고 기본값으로 진행한다."""
+def setup_korean_font() -> None:
+    """OS 환경에 맞춰 matplotlib 한글 폰트를 자동으로 설정한다."""
+    system_name = platform.system()
+    
+    if system_name == "Windows":
+        font_name = "Malgun Gothic"
+    elif system_name == "Darwin":
+        font_name = "AppleGothic"
+    else:  # Linux 및 기타 환경
+        font_name = "NanumGothic"
+        
     from matplotlib import font_manager
 
     available = {f.name for f in font_manager.fontManager.ttflist}
