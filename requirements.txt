@@ -7,3 +7,10 @@ pydantic
 jinja2
 schedule
 httpx
+pyarrow
+polars
+scipy
+scikit-learn
+seaborn
+plotly
+joblib

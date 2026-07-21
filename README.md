@@ -32,6 +32,16 @@ pip install -r requirements.txt
 pytest tests/
 ```
 
+## 요금 예측 & Pandas/Polars 성능 비교 분석
+주제: Pandas vs Polars 처리 성능 비교 기반 고요금(High-Fare) 운행 예측
+
+```bash
+python src/run_fare_analysis.py
+```
+
+- 모듈 구성: `src/fare_analysis/{config,data_io,eda,stats_analysis,visualization,ml_pipeline,report}.py`
+- 산출물(`output/`): 처리속도 비교 바 차트(`speed_comparison.png`), 시간대별 요금 인터랙티브 차트(`hourly_fare_trend.html`), 학습된 모델(`high_fare_pipeline.joblib`), 자동 생성 리포트(`report.md`)
+
 ## 데이터 출처
 - `data/raw/`에는 원본 데이터를 직접 커밋하지 않습니다. 데이터 출처(URL·수집 스크립트)는 이 섹션에 기록합니다.
 
