@@ -12,5 +12,6 @@ polars
 pyarrow
 seaborn
 plotly
+kaleido
 scikit-learn
 scipy
