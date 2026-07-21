@@ -35,6 +35,10 @@ pytest tests/
 ## 데이터 출처
 - `data/raw/`에는 원본 데이터를 직접 커밋하지 않습니다. 데이터 출처(URL·수집 스크립트)는 이 섹션에 기록합니다.
 
+| 파일 | 출처 | 다운로드 |
+|---|---|---|
+| `yellow_tripdata_2026-05.parquet` | NYC TLC Trip Record Data (Yellow Taxi, 2026-05) | `curl -L -o data/raw/yellow_tripdata_2026-05.parquet https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2026-05.parquet` |
+
 ## 브랜치 전략
 - `main`: 프로젝트 공통 구조 및 리뷰 완료된 코드
 - 팀원별 개인 브랜치에서 작업 후 PR로 병합
