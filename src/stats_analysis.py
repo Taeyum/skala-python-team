@@ -10,10 +10,7 @@ src.eda.clean_trip_data로 정제된 DataFrame(trip_duration 포함)을 입력�
 import pandas as pd
 from scipy import stats
 
-ALPHA = 0.05
-STRONG_CORR_THRESHOLD = 0.5
-RUSH_HOURS = (8, 9, 10, 17, 18, 19)
-CORRELATION_COLUMNS = ["trip_distance", "trip_duration", "total_amount"]
+from src.config import ALPHA, CORRELATION_COLUMNS, RUSH_HOURS, STRONG_CORR_THRESHOLD
 
 
 def correlation_matrix(df: pd.DataFrame, columns: list[str] = CORRELATION_COLUMNS) -> dict:

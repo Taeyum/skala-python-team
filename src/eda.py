@@ -8,9 +8,7 @@ trip_duration IQR)를 처리해 이후 시각화·통계·ML 단계의 공통 �
 
 import pandas as pd
 
-FARE_COLUMNS = ["fare_amount", "total_amount"]
-DATE_MIN = pd.Timestamp("2026-05-01")
-DATE_MAX = pd.Timestamp("2026-06-01")
+from src.config import DATE_MAX, DATE_MIN, FARE_COLUMNS
 
 
 def missing_summary(df: pd.DataFrame) -> pd.Series:

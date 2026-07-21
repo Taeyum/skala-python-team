@@ -101,3 +101,57 @@ def test_generate_report_renders_markdown_file(sample_context, tmp_path):
 def test_generate_report_missing_template_raises(sample_context, tmp_path):
     with pytest.raises(FileNotFoundError):
         generate_report(sample_context, template_path="templates/does_not_exist.md.j2", output_path=tmp_path / "r.md")
+
+
+def test_build_context_handles_all_stages_failed():
+    """모든 단계가 실패(None)해도 build_context는 예외 없이 fallback 컨텍스트를 만든다."""
+    context = build_context(
+        dataset_path="data/raw/yellow_tripdata_2026-05.parquet",
+        rows_before=None,
+        rows_after=None,
+        missing_summary=None,
+        duplicates_removed=None,
+        fare_stats=None,
+        benchmark_timings=None,
+        correlation_result=None,
+        ttest_result=None,
+        pipeline_result=None,
+        chart_paths={"benchmark_bar": "output/benchmark_speed.png", "hourly_fare_line": "output/hourly_fare_line.html"},
+    )
+
+    assert context["missing_summary"] == {}
+    assert context["fare_stats"] == {}
+    assert "error" in context["benchmark"]
+    assert "error" in context["correlation"]
+    assert "error" in context["ttest"]
+    assert "error" in context["pipeline"]
+
+
+def test_generate_report_renders_when_some_stages_failed(tmp_path):
+    """일부 단계만 실패해도 report.md 생성 자체는 죽지 않고 오류 메시지를 남긴다."""
+    context = build_context(
+        dataset_path="data/raw/yellow_tripdata_2026-05.parquet",
+        rows_before=100,
+        rows_after=90,
+        missing_summary=pd.Series({"a": 1.0}),
+        duplicates_removed=0,
+        fare_stats=pd.DataFrame(
+            {"fare_amount": [1, 2, 3, 4, 5, 6, 7, 8], "total_amount": [1, 2, 3, 4, 5, 6, 7, 8]},
+            index=["count", "mean", "std", "min", "25%", "50%", "75%", "max"],
+        ),
+        benchmark_timings=None,  # 벤치마크 단계 실패
+        correlation_result=None,  # 상관분석 단계 실패
+        ttest_result=None,  # t-test 단계 실패
+        pipeline_result=None,  # ML 단계 실패
+        chart_paths={"benchmark_bar": "output/benchmark_speed.png", "hourly_fare_line": "output/hourly_fare_line.html"},
+    )
+
+    output_path = tmp_path / "report.md"
+    generate_report(context, template_path="templates/report_template.md.j2", output_path=output_path)
+
+    content = output_path.read_text(encoding="utf-8")
+    assert "벤치마크 단계 실패" in content
+    assert "상관분석 단계 실패" in content
+    assert "t-test 단계 실패" in content
+    assert "ML Pipeline 단계 실패" in content
+    assert "검증 실패" in content  # 결론 섹션의 가설1/2 판정

@@ -12,9 +12,7 @@ from pathlib import Path
 import pandas as pd
 import polars as pl
 
-from src.eda import DATE_MAX, DATE_MIN
-
-OPERATIONS = ["로딩", "필터링", "시간대별집계"]
+from src.config import DATE_MAX, DATE_MIN, OPERATIONS
 
 
 def load_pandas(path: str | Path) -> pd.DataFrame:

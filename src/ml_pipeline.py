@@ -21,9 +21,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-TARGET_QUANTILE = 0.75
-NUMERIC_FEATURES = ["trip_distance", "trip_duration", "passenger_count"]
-CATEGORICAL_FEATURES = ["pickup_hour", "pickup_weekday", "payment_type"]
+from src.config import CATEGORICAL_FEATURES, NUMERIC_FEATURES, TARGET_QUANTILE
 
 
 def add_temporal_features(df: pd.DataFrame) -> pd.DataFrame:
